@@ -6,12 +6,12 @@ import com.project.concert.model.User;
 import com.project.concert.repository.ConcertRepository;
 import com.project.concert.repository.PaymentRepository;
 import com.project.concert.repository.UserRepository;
+import com.project.concert.service.CloudinaryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 
 @RestController
@@ -27,6 +27,9 @@ public class PaymentController {
     @Autowired
     private ConcertRepository concertRepository;
 
+    @Autowired
+    private CloudinaryService cloudinaryService;
+
     @PostMapping
     public ResponseEntity<String> uploadProof(
             @RequestParam("proof") MultipartFile proof,
@@ -35,20 +38,19 @@ public class PaymentController {
             @RequestParam("price") Double price
     ) {
         try {
-            // Save uploaded file
-            String uploadDirPath = System.getProperty("user.dir") + File.separator + "uploads";
-            File uploadDir = new File(uploadDirPath);
-            if (!uploadDir.exists()) uploadDir.mkdirs();
+            // ✅ Check file type (optional)
+            if (!proof.getContentType().startsWith("image/")) {
+                return ResponseEntity.badRequest().body("Only image files are allowed");
+            }
 
-            String fileName = System.currentTimeMillis() + "_" + proof.getOriginalFilename();
-            File savedFile = new File(uploadDir, fileName);
-            proof.transferTo(savedFile);
+            // ✅ Upload file to Cloudinary
+            String imageUrl = cloudinaryService.uploadFile(proof);
 
             // ✅ Ensure user exists (create if not)
             User user = userRepository.findByEmail(email).orElseGet(() -> {
                 User newUser = new User();
                 newUser.setEmail(email);
-                newUser.setRegion("Unknown"); // or receive region from frontend later
+                newUser.setRegion("Unknown"); // Update if frontend sends region
                 return userRepository.save(newUser);
             });
 
@@ -56,21 +58,21 @@ public class PaymentController {
             Concert concert = concertRepository.findById(concertId)
                     .orElseThrow(() -> new RuntimeException("Concert not found: " + concertId));
 
-            // ✅ Save payment
+            // ✅ Save payment with Cloudinary URL
             Payment payment = new Payment();
             payment.setUser(user);
             payment.setConcert(concert);
             payment.setPrice(price);
-            payment.setProofFileName(fileName);
+            payment.setProofUrl(imageUrl);  // renamed field
 
             paymentRepository.save(payment);
 
-            System.out.println("✅ Payment SAVED for: " + email + " | concertId: " + concertId);
+            System.out.println("✅ Payment SAVED: " + email + " -> concertId: " + concertId);
             return ResponseEntity.ok("Payment saved");
 
         } catch (IOException e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error uploading file");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error uploading proof");
         }
     }
 }
