@@ -1,61 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
 		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
 	<modelVersion>4.0.0</modelVersion>
-
-	<groupId>com.example</groupId>
-	<artifactId>concert-booking</artifactId>
-	<version>1.0.0</version>
-	<packaging>jar</packaging>
-
-	<name>concert-booking</name>
-	<description>Concert Booking Backend</description>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.2.3</version> <!-- Or latest compatible -->
-		<relativePath/> <!-- lookup parent from repository -->
+		<version>3.4.4</version>
+		<relativePath/>
 	</parent>
 
+	<groupId>com.project</groupId>
+	<artifactId>concert</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>Concert Ticket Booking System</name>
+	<description>Concert Ticket Booking System using Spring Boot + MySQL</description>
+
 	<properties>
-		<java.version>17</java.version> <!-- Use your actual JDK version -->
+		<java.version>21</java.version>
 	</properties>
 
 	<dependencies>
-		<!-- Web API -->
+		<!-- Web & REST API -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
-		<!-- MySQL -->
+		<!-- JPA (ORM) -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+
+		<!-- Thymeleaf (optional frontend templating) -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+		</dependency>
+
+		<!-- MySQL Driver -->
 		<dependency>
 			<groupId>com.mysql</groupId>
 			<artifactId>mysql-connector-j</artifactId>
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- JPA / Hibernate -->
+		<!-- DevTools (hot reload) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa</artifactId>
-		</dependency>
-
-		<!-- Validation (optional, but common) -->
-		<dependency>
-			<groupId>jakarta.validation</groupId>
-			<artifactId>jakarta.validation-api</artifactId>
-		</dependency>
-
-		<!-- Lombok (if you use @Getter, @Setter, etc.) -->
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<scope>runtime</scope>
 			<optional>true</optional>
 		</dependency>
 
-		<!-- Testing (optional) -->
+		<!-- Testing -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
@@ -65,11 +66,11 @@
 
 	<build>
 		<plugins>
-			<!-- Spring Boot Maven Plugin -->
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
 	</build>
+
 </project>
