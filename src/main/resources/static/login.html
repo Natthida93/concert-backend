@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Login</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<section class="login-section">
+    <h1>Welcome</h1>
+    <h2>Login to book your concert</h2>
+
+    <form id="loginForm" class="login-form">
+        <div class="form-group">
+            <input type="text" id="loginFullName" placeholder="Full Name" required />
+        </div>
+        <div class="form-group">
+            <input type="email" id="loginEmail" placeholder="Email" required />
+        </div>
+        <div class="form-group">
+            <select id="loginRegion" required>
+                <option value="">Select Region</option>
+                <option value="Asia">Asia</option>
+                <option value="Europe">Europe</option>
+                <option value="North America">North America</option>
+            </select>
+        </div>
+        <button type="submit" class="btn">Login</button>
+    </form>
+</section>
+
+<!-- ScrollReveal and Typed.js -->
+<script src="https://unpkg.com/scrollreveal"></script>
+<script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+
+<!-- custom JS must be included last -->
+<script src="script.js"></script>
+</body>
+</html>

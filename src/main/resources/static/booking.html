@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Book Concert</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<section class="home">
+    <div class="home-content">
+        <h1>Book Your Concert</h1>
+
+        <p><strong>Name:</strong> <span id="userName"></span></p>
+        <p><strong>Region:</strong> <span id="userRegion"></span></p>
+
+        <label for="concertSelect">Choose a concert:</label><br />
+        <select id="concertSelect">
+            <option value="1" data-price="120">Taylor Swift Tour - $120</option>
+            <option value="2" data-price="75">Keshi Live - $75</option>
+            <option value="3" data-price="140">Coldplay World Tour - $140</option>
+            <option value="4" data-price="95">MarkTuan World Tour High As You - $95</option>
+            <option value="5" data-price="110">Fujii Kaze World Tour - $110</option>
+        </select>
+
+        <p><strong>Price:</strong> $<span id="concertPrice">120</span></p>
+
+        <form id="paymentForm">
+            <label for="proof">Upload payment screenshot:</label><br />
+            <input type="file" id="proof" required /><br /><br />
+            <button type="submit" class="btn">Submit Booking</button>
+        </form>
+    </div>
+</section>
+
+<!-- ScrollReveal and Typed.js from CDN -->
+<script src="https://unpkg.com/scrollreveal"></script>
+<script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+
+<script>
+    // Load user info
+    const userName = localStorage.getItem("fullName") || "Unknown";
+    const userRegion = localStorage.getItem("region") || "Unknown";
+    const userEmail = localStorage.getItem("email") || "";
+
+    document.getElementById("userName").textContent = userName;
+    document.getElementById("userRegion").textContent = userRegion;
+
+    // Update price display on selection
+    const concertSelect = document.getElementById("concertSelect");
+    const concertPrice = document.getElementById("concertPrice");
+
+    concertSelect.addEventListener("change", () => {
+      const selectedOption = concertSelect.options[concertSelect.selectedIndex];
+      concertPrice.textContent = selectedOption.getAttribute("data-price");
+    });
+
+    // Submit form
+    document.getElementById("paymentForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const file = document.getElementById("proof").files[0];
+      const selectedOption = concertSelect.options[concertSelect.selectedIndex];
+      const concertId = selectedOption.value;
+      const price = selectedOption.getAttribute("data-price");
+
+      if (!file || !userEmail) {
+        alert("Missing required data.");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("proof", file);
+      formData.append("userEmail", userEmail);
+      formData.append("concertId", concertId);
+      formData.append("price", parseFloat(price));
+
+      try {
+        // Upload payment proof
+        const res = await fetch("/payments", {
+          method: "POST",
+          body: formData
+        });
+
+        if (res.ok) {
+          // Then create booking
+          const bookingRes = await fetch("/bookings", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              userEmail: userEmail,
+              concertId: concertId
+            })
+          });
+
+          if (bookingRes.ok) {
+            window.location.href = "success.html";
+          } else {
+            alert("Booking failed.");
+          }
+        } else {
+          alert("Payment failed.");
+        }
+      } catch (err) {
+        console.error("Error:", err);
+        alert("An error occurred.");
+      }
+    });
+</script>
+
+</body>
+</html>
