@@ -38,6 +38,8 @@
 <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
 
 <script>
+    const backendUrl = "https://concert-backend-ib7f.onrender.com"; // ✅ BACKEND URL
+
     // Load user info
     const userName = localStorage.getItem("fullName") || "Unknown";
     const userRegion = localStorage.getItem("region") || "Unknown";
@@ -76,15 +78,15 @@
       formData.append("price", parseFloat(price));
 
       try {
-        // Upload payment proof
-        const res = await fetch("/payments", {
+        // 1. Upload payment proof
+        const res = await fetch(`${backendUrl}/payments`, {
           method: "POST",
           body: formData
         });
 
         if (res.ok) {
-          // Then create booking
-          const bookingRes = await fetch("/bookings", {
+          // 2. Then create booking
+          const bookingRes = await fetch(`${backendUrl}/bookings`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json"
