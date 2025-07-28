@@ -99,6 +99,7 @@
           });
 
           if (bookingRes.ok) {
+          const concertText = selectedOption.textContent;
                     // Save concert name for success page
                     localStorage.setItem("bookedConcert", concertText);
 
