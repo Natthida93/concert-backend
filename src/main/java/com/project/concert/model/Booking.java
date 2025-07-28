@@ -4,7 +4,10 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "booking")
+@Table(
+        name = "booking",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "concert_id"})
+)
 public class Booking {
 
     @Id
@@ -12,14 +15,20 @@ public class Booking {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false) // Foreign key to User
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "concert_id", nullable = false) // Foreign key to Concert
+    @JoinColumn(name = "concert_id", nullable = false)
     private Concert concert;
 
     private LocalDateTime bookingTime;
+
+    // Auto-set the bookingTime before save
+    @PrePersist
+    protected void onCreate() {
+        this.bookingTime = LocalDateTime.now();
+    }
 
     // === GETTERS ===
     public Long getId() {
