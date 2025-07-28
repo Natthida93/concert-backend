@@ -16,10 +16,16 @@ public class PaymentService {
     private PaymentRepository paymentRepository;
 
     public Payment savePayment(Payment payment) {
+        // ✅ Check if user already uploaded proof for this concert
+        Optional<Payment> existing = paymentRepository.findByUserAndConcert(payment.getUser(), payment.getConcert());
+        if (existing.isPresent()) {
+            throw new RuntimeException("Payment already submitted for this concert.");
+        }
+
         return paymentRepository.save(payment);
     }
 
-    // this method to check for existing payment
+    // Optional separate method if needed elsewhere
     public Optional<Payment> findByUserAndConcert(User user, Concert concert) {
         return paymentRepository.findByUserAndConcert(user, concert);
     }

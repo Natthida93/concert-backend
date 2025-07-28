@@ -4,9 +4,9 @@ import com.project.concert.model.Concert;
 import com.project.concert.model.Payment;
 import com.project.concert.model.User;
 import com.project.concert.repository.ConcertRepository;
-import com.project.concert.repository.PaymentRepository;
 import com.project.concert.repository.UserRepository;
 import com.project.concert.service.CloudinaryService;
+import com.project.concert.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +20,7 @@ import java.util.Optional;
 public class PaymentController {
 
     @Autowired
-    private PaymentRepository paymentRepository;
+    private PaymentService paymentService;
 
     @Autowired
     private UserRepository userRepository;
@@ -59,24 +59,27 @@ public class PaymentController {
             Concert concert = concertRepository.findById(concertId)
                     .orElseThrow(() -> new RuntimeException("Concert not found: " + concertId));
 
-            // ✅ Check for duplicate payment
-            Optional<Payment> existingPayment = paymentRepository.findByUserAndConcert(user, concert);
+            // ✅ Check for existing payment
+            Optional<Payment> existingPayment = paymentService.findByUserAndConcert(user, concert);
             if (existingPayment.isPresent()) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body("Payment already submitted for this concert.");
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body("Payment already submitted for this concert.");
             }
 
-            // ✅ Save new payment
+            // ✅ Prepare and save payment
             Payment payment = new Payment();
             payment.setUser(user);
             payment.setConcert(concert);
             payment.setPrice(price);
             payment.setProofUrl(imageUrl);
 
-            paymentRepository.save(payment);
+            paymentService.savePayment(payment);
 
             System.out.println("✅ Payment SAVED: " + email + " -> concertId: " + concertId);
             return ResponseEntity.ok("Payment saved");
 
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
         } catch (IOException e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error uploading proof");
