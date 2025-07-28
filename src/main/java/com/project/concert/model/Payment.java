@@ -3,6 +3,9 @@ package com.project.concert.model;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "payment", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"user_id", "concert_id"})
+})
 public class Payment {
 
     @Id
@@ -11,16 +14,17 @@ public class Payment {
 
     private Double price;
 
-    private String proofUrl; // ✅ updated field
+    private String proofUrl;
 
     @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @ManyToOne
+    @JoinColumn(name = "concert_id", nullable = false)
     private Concert concert;
 
-    // Getters and setters
-
+    // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/payments")
@@ -38,7 +39,7 @@ public class PaymentController {
             @RequestParam("price") Double price
     ) {
         try {
-            // ✅ Check file type (optional)
+            // ✅ Check file type
             if (!proof.getContentType().startsWith("image/")) {
                 return ResponseEntity.badRequest().body("Only image files are allowed");
             }
@@ -46,24 +47,30 @@ public class PaymentController {
             // ✅ Upload file to Cloudinary
             String imageUrl = cloudinaryService.uploadFile(proof);
 
-            // ✅ Ensure user exists (create if not)
+            // ✅ Ensure user exists
             User user = userRepository.findByEmail(email).orElseGet(() -> {
                 User newUser = new User();
                 newUser.setEmail(email);
-                newUser.setRegion("Unknown"); // Update if frontend sends region
+                newUser.setRegion("Unknown");
                 return userRepository.save(newUser);
             });
 
-            // ✅ Get concert from DB
+            // ✅ Get concert
             Concert concert = concertRepository.findById(concertId)
                     .orElseThrow(() -> new RuntimeException("Concert not found: " + concertId));
 
-            // ✅ Save payment with Cloudinary URL
+            // ✅ Check for duplicate payment
+            Optional<Payment> existingPayment = paymentRepository.findByUserAndConcert(user, concert);
+            if (existingPayment.isPresent()) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("Payment already submitted for this concert.");
+            }
+
+            // ✅ Save new payment
             Payment payment = new Payment();
             payment.setUser(user);
             payment.setConcert(concert);
             payment.setPrice(price);
-            payment.setProofUrl(imageUrl);  // renamed field
+            payment.setProofUrl(imageUrl);
 
             paymentRepository.save(payment);
 
