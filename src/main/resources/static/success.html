@@ -59,8 +59,21 @@
 <body>
 <div class="success-container">
     <h1>✅ Booking Successful!</h1>
-    <p>Thank you for booking. We’ve received your payment proof.</p>
+    <p id="message">Thank you for booking. We’ve received your payment proof.</p>
     <a href="login.html">Back to Home</a>
 </div>
+
+<script>
+    const concertName = localStorage.getItem("bookedConcert");
+    if (concertName) {
+      document.getElementById("message").textContent =
+        `Thank you for booking "${concertName}". We’ve received your payment proof.`;
+      localStorage.removeItem("bookedConcert"); // cleanup
+    }
+</script>
+
 </body>
 </html>
+
+
+

@@ -99,7 +99,11 @@
           });
 
           if (bookingRes.ok) {
-            window.location.href = "success.html";
+                    // Save concert name for success page
+                    localStorage.setItem("bookedConcert", concertText);
+
+                    //  Go to success page
+                    window.location.href = "success.html"
           } else {
             alert("Booking failed.");
           }
